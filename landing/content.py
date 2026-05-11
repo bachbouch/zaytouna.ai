@@ -2,33 +2,97 @@ import math
 
 # ── Role positions (lang-independent geometry) ───────────
 _ROLE_GEOM = [
-    ("researcher",   -162, "R"),
-    ("builder",      -136, "B"),
-    ("philosopher",  -110, "Φ"),
-    ("sociologist",   -98, "Ψ"),
-    ("linguist",      -86, "ل"),
-    ("investor",      -62, "$"),
-    ("tester",        -38, "✓"),
-    ("labeler",       -14, "✎"),
-    ("economist",      12, "Σ"),
-    ("entrepreneur",   38, "▲"),
-    ("government",     64, "★"),
+    ("researcher",   -162.0, "R"),
+    ("builder",      -139.4, "B"),
+    ("philosopher",  -116.8, "Φ"),
+    ("sociologist",   -94.2, "Ψ"),
+    ("linguist",      -71.6, "ل"),
+    ("investor",      -49.0, "$"),
+    ("tester",        -26.4, "✓"),
+    ("labeler",        -3.8, "✎"),
+    ("economist",      18.8, "Σ"),
+    ("entrepreneur",   41.4, "▲"),
+    ("government",     64.0, "★"),
 ]
 
 def _positions():
+    """Node + label geometry. Labels float radially outside the orbit so they
+    don't overlap each other; text-anchor flows with the node's angle."""
     out = {}
     for rid, angle, glyph in _ROLE_GEOM:
         a = math.radians(angle)
+        cos_a, sin_a = math.cos(a), math.sin(a)
+        # Node (on the orbital ring)
+        nx = cos_a * 290
+        ny = sin_a * 260 - 60
+        # Label (pushed further out radially)
+        lx = cos_a * 410
+        ly = sin_a * 350 - 60
+        # Anchor: side labels read outward away from the centre
+        if cos_a > 0.1:
+            anchor = "start"; lx += 6
+        elif cos_a < -0.1:
+            anchor = "end";   lx -= 6
+        else:
+            anchor = "middle"
+        # Vertical nudge: top-of-orbit labels lift further; bottom labels drop
+        if sin_a < -0.85:
+            ly -= 18
+        elif sin_a < -0.5:
+            ly -= 6
+        elif sin_a > 0.85:
+            ly += 24
+        elif sin_a > 0.5:
+            ly += 14
+        else:
+            ly += 4
         out[rid] = {
             "id": rid,
             "glyph": glyph,
-            "x": round(math.cos(a) * 290, 1),
-            "y": round(math.sin(a) * 260 - 60, 1),
+            "x": round(nx, 1),
+            "y": round(ny, 1),
+            "label_x": round(lx, 1),
+            "label_y": round(ly, 1),
+            "text_anchor": anchor,
         }
     return out
 
 ROLE_POS = _positions()
 STATS = {"members": 342, "governorates": 14, "groups": 6}
+
+# 24 Tunisian governorates (slug, English, Arabic)
+GOVERNORATES = [
+    ("tunis",        "Tunis",        "تونس"),
+    ("ariana",       "Ariana",       "أريانة"),
+    ("ben-arous",    "Ben Arous",    "بن عروس"),
+    ("manouba",      "Manouba",      "منوبة"),
+    ("nabeul",       "Nabeul",       "نابل"),
+    ("zaghouan",     "Zaghouan",     "زغوان"),
+    ("bizerte",      "Bizerte",      "بنزرت"),
+    ("beja",         "Béja",         "باجة"),
+    ("jendouba",     "Jendouba",     "جندوبة"),
+    ("kef",          "Le Kef",       "الكاف"),
+    ("siliana",      "Siliana",      "سليانة"),
+    ("sousse",       "Sousse",       "سوسة"),
+    ("monastir",     "Monastir",     "المنستير"),
+    ("mahdia",       "Mahdia",       "المهدية"),
+    ("sfax",         "Sfax",         "صفاقس"),
+    ("kairouan",     "Kairouan",     "القيروان"),
+    ("kasserine",    "Kasserine",    "القصرين"),
+    ("sidi-bouzid",  "Sidi Bouzid",  "سيدي بوزيد"),
+    ("gabes",        "Gabès",        "قابس"),
+    ("medenine",     "Medenine",     "مدنين"),
+    ("tataouine",    "Tataouine",    "تطاوين"),
+    ("gafsa",        "Gafsa",        "قفصة"),
+    ("tozeur",       "Tozeur",       "توزر"),
+    ("kebili",       "Kebili",       "قبلي"),
+]
+
+def get_governorates(lang):
+    return [
+        {"slug": slug, "name": ar if lang == "ar-TN" else en}
+        for slug, en, ar in GOVERNORATES
+    ]
 
 # ── Role labels per language ─────────────────────────────
 ROLE_LABELS = {
@@ -111,6 +175,8 @@ TEXTS = {
         "dir": "ltr",
         "switch_url": "/tn/",
         "switch_label": "بالدارجة",
+        "login_label": "Sign in",
+        "logout_label": "Sign out",
         "brand": {"name": "Zaytouna", "tag": "AI"},
         "meta": {
             "title": "Zaytouna AI — Rooted in Tunisia, reaching toward the future.",
@@ -182,6 +248,41 @@ TEXTS = {
             "welcome": "Welcome to the grove.",
             "followup": "We will write back within seven days. Inshallah, sooner.",
         },
+        "join_flow": {
+            "step_label": "Step",
+            "of_label": "of",
+            "q1_eyebrow": "01 · You",
+            "q1_title": "First, your name.",
+            "q1_hint": "How should we address you?",
+            "q1_first": "First name",
+            "q1_last": "Last name",
+            "q2_eyebrow": "02 · Branch",
+            "q2_title": "What best describes you?",
+            "q2_hint": "Pick the closest match — you can change it later.",
+            "q2_other": "Other",
+            "q2_other_placeholder": "Describe yourself in a few words",
+            "q3_eyebrow": "03 · Help",
+            "q3_title": "What can you help with?",
+            "q3_hint": "Check anything that sounds like you. Pick as many as fit.",
+            "q4_eyebrow": "04 · Account",
+            "q4_title": "Create your account.",
+            "q4_hint": "So you can log in later and pick up where you left off.",
+            "q4_city": "City or governorate (optional)",
+            "q4_email": "Email",
+            "q4_password": "Password — at least 8 characters",
+            "btn_continue": "Continue",
+            "btn_back": "Back",
+            "btn_submit": "Plant your name",
+            "kbd_enter": "press Enter ↵",
+            "success_title": "Check your email.",
+            "success_body": "We sent a verification link to your inbox. Click it within 3 days to activate your account and join the grove.",
+            "success_close": "Close",
+            "err_required": "This field is required.",
+            "err_email": "Enter a valid email address.",
+            "err_password": "Password must be at least 8 characters.",
+            "err_role": "Pick a branch — or write your own.",
+            "err_server": "Something went wrong. Try again in a moment.",
+        },
         "footer": {
             "address": "zaytouna.ai · Lac 2, Tunis",
             "rights":  "Open weights. Open data. Open future.",
@@ -195,6 +296,8 @@ TEXTS = {
         "dir": "rtl",
         "switch_url": "/",
         "switch_label": "English",
+        "login_label": "دخول",
+        "logout_label": "خروج",
         "brand": {"name": "زيتونة", "tag": "AI"},
         "draft_banner": "هاذي نسخة سريعة بالدارجة — اقتراحاتك مرحب بيها.",
         "meta": {
@@ -266,6 +369,41 @@ TEXTS = {
             "submit": "ازرع اسمك",
             "welcome": "مرحبا بيك في الغابة.",
             "followup": "نجاوبوك في ظرف أسبوع. إن شاء الله قبل.",
+        },
+        "join_flow": {
+            "step_label": "خطوة",
+            "of_label": "من",
+            "q1_eyebrow": "01 · أنت",
+            "q1_title": "نبداو باسمك.",
+            "q1_hint": "كيفاش نناديوك؟",
+            "q1_first": "الاسم",
+            "q1_last": "اللقب",
+            "q2_eyebrow": "02 · الغصن",
+            "q2_title": "أش يشبهك أكثر؟",
+            "q2_hint": "اختار الأقرب — تنجم تبدّل بعد.",
+            "q2_other": "غير ذلك",
+            "q2_other_placeholder": "وصّف روحك في كلمات",
+            "q3_eyebrow": "03 · المساعدة",
+            "q3_title": "بأش تنجم تعاون؟",
+            "q3_hint": "اختار كل اللي يشبهك. باش ما باش يكون عدد.",
+            "q4_eyebrow": "04 · الحساب",
+            "q4_title": "اعمل حسابك.",
+            "q4_hint": "باش تنجم تدخل لاحقاً و تكمل من وين وقفت.",
+            "q4_city": "المدينة أو الولاية (اختياري)",
+            "q4_email": "البريد الإلكتروني",
+            "q4_password": "كلمة السر — على الأقل 8 أحرف",
+            "btn_continue": "كمّل",
+            "btn_back": "رجوع",
+            "btn_submit": "ازرع اسمك",
+            "kbd_enter": "اضغط Enter ↵",
+            "success_title": "شوف إيميلك.",
+            "success_body": "بعثنالك لينك تثبيت في الإيميل. اضغط عليه قبل 3 أيام باش يتفعّل حسابك و تنضم للغابة.",
+            "success_close": "غلق",
+            "err_required": "هذا الحقل ضروري.",
+            "err_email": "ادخل بريد إلكتروني صحيح.",
+            "err_password": "كلمة السر لازم 8 أحرف على الأقل.",
+            "err_role": "اختار غصن — ولا اكتب وصفك.",
+            "err_server": "وقعت مشكلة. عاود من جديد.",
         },
         "footer": {
             "address": "zaytouna.ai · بحيرة 2، تونس",

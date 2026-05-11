@@ -122,3 +122,14 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ── Email (dev: prints to runserver console) ─────────────────────────────
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "Zaytouna <noreply@zaytouna.ai>"
+SITE_URL = "http://127.0.0.1:8765"
+
+# ── Auth ─────────────────────────────────────────────────────────────────
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3  # 3 days

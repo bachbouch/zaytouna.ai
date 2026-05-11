@@ -316,33 +316,254 @@ function initRoleFilter() {
   );
 }
 
-// ── join modal ───────────────────────────────────────────
-function openModal(id, name, desc) {
+// ── join flow (Typeform-style multi-step) ────────────────
+function openModal(preselectRoleId) {
   const dlg = document.getElementById("join-modal");
   if (!dlg) return;
-  dlg.querySelector("[data-role-name]").textContent = name || "Researcher";
-  dlg.querySelector("[data-role-desc]").textContent = desc || "";
-  dlg.querySelector("[data-role-id]").value = id || "researcher";
-  dlg.querySelector(".modal-form-wrap").hidden = false;
-  dlg.querySelector(".modal-success").hidden = true;
+  if (!dlg.dataset.initialized) {
+    bootJoinFlow(dlg);
+    dlg.dataset.initialized = "1";
+  }
+  joinGoTo(dlg, 1);
+  if (preselectRoleId) dlg._pendingRole = preselectRoleId;
   dlg.showModal();
 }
 
 function initModal() {
   const dlg = document.getElementById("join-modal");
   if (!dlg) return;
-  // open via [data-join] buttons
   document.querySelectorAll("[data-join]").forEach((btn) =>
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      openModal("researcher", "Researcher", "Architectures, scaling, evals. Publish openly. Train fearlessly.");
+      openModal();
     })
   );
-  dlg.querySelector(".modal-close").addEventListener("click", () => dlg.close());
-  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
-  dlg.querySelector(".modal-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    dlg.querySelector(".modal-form-wrap").hidden = true;
-    dlg.querySelector(".modal-success").hidden = false;
+  dlg.querySelector(".flow-close").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => {
+    // click on backdrop only — not on inner stage
+    if (e.target === dlg) dlg.close();
   });
+}
+
+const FLOW_TOTAL = 4;
+
+function bootJoinFlow(dlg) {
+  const state = (dlg._state = {
+    first_name: "", last_name: "",
+    role: null, other_role: "",
+    helps_with: new Set(),
+    city: "", email: "", password: "",
+  });
+  dlg._total = FLOW_TOTAL;
+
+  // Load roles + help items in parallel
+  const lang = dlg.dataset.lang === "ar-TN" ? "ar-TN" : "en";
+  fetch(`${dlg.dataset.rolesUrl}?lang=${encodeURIComponent(lang)}`)
+    .then((r) => r.json())
+    .then((d) => renderRoles(dlg, d.roles || []))
+    .catch(() => renderRoles(dlg, []));
+  fetch(`${dlg.dataset.helpUrl}?lang=${encodeURIComponent(lang)}`)
+    .then((r) => r.json())
+    .then((d) => renderHelp(dlg, d.items || []))
+    .catch(() => renderHelp(dlg, []));
+
+  // Step nav buttons
+  dlg.querySelectorAll(".flow-next").forEach((btn) =>
+    btn.addEventListener("click", () => onNext(dlg))
+  );
+  dlg.querySelectorAll(".flow-back").forEach((btn) =>
+    btn.addEventListener("click", () => onBack(dlg))
+  );
+  dlg.querySelector(".flow-submit").addEventListener("click", () => onSubmit(dlg));
+  dlg.querySelector(".flow-close-success")?.addEventListener("click", () => dlg.close());
+
+  // Keyboard: Enter on text inputs advances
+  dlg.querySelectorAll("input").forEach((inp) => {
+    inp.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const stepEl = inp.closest(".flow-step");
+      if (!stepEl) return;
+      const step = parseInt(stepEl.dataset.step, 10);
+      e.preventDefault();
+      if (step === FLOW_TOTAL) onSubmit(dlg);
+      else onNext(dlg);
+    });
+  });
+
+  // Track field changes
+  bindInput(dlg, 'input[name="first_name"]', "first_name");
+  bindInput(dlg, 'input[name="last_name"]', "last_name");
+  bindInput(dlg, 'input[name="other_role"]', "other_role");
+  bindInput(dlg, 'input[name="city"]', "city");
+  bindInput(dlg, 'input[name="email"]', "email");
+  bindInput(dlg, 'input[name="password"]', "password");
+}
+
+function bindInput(dlg, sel, key) {
+  const el = dlg.querySelector(sel);
+  if (!el) return;
+  el.addEventListener("input", () => { dlg._state[key] = el.value; });
+}
+
+function renderRoles(dlg, roles) {
+  const wrap = dlg.querySelector(".role-cards");
+  wrap.innerHTML = "";
+  roles.forEach((r) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "role-card";
+    card.dataset.slug = r.slug;
+    card.innerHTML = `<span class="glyph">${r.glyph || ""}</span><span class="label">${r.name}</span>`;
+    card.addEventListener("click", () => selectRole(dlg, r.slug));
+    wrap.appendChild(card);
+  });
+  // "Other" card
+  const otherLabel = dlg.dataset.otherLabel || "Other";
+  const otherCard = document.createElement("button");
+  otherCard.type = "button";
+  otherCard.className = "role-card role-card-other";
+  otherCard.dataset.slug = "other";
+  otherCard.innerHTML = `<span class="glyph">+</span><span class="label">${otherLabel}</span>`;
+  otherCard.addEventListener("click", () => selectRole(dlg, "other"));
+  wrap.appendChild(otherCard);
+
+  // Apply pending preselect if any
+  if (dlg._pendingRole) {
+    selectRole(dlg, dlg._pendingRole);
+    dlg._pendingRole = null;
+  }
+}
+
+function selectRole(dlg, slug) {
+  dlg._state.role = slug;
+  dlg.querySelectorAll(".role-card").forEach((c) =>
+    c.classList.toggle("selected", c.dataset.slug === slug)
+  );
+  const otherWrap = dlg.querySelector(".other-role-wrap");
+  if (otherWrap) otherWrap.hidden = slug !== "other";
+  if (slug === "other") {
+    setTimeout(() => otherWrap.querySelector("input")?.focus(), 50);
+  }
+}
+
+function renderHelp(dlg, items) {
+  const wrap = dlg.querySelector(".help-cards");
+  wrap.innerHTML = "";
+  items.forEach((h) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "help-card";
+    card.dataset.slug = h.slug;
+    card.innerHTML = `<span class="help-check"></span><span class="label">${h.label}</span>`;
+    card.addEventListener("click", () => toggleHelp(dlg, h.slug, card));
+    wrap.appendChild(card);
+  });
+}
+
+function toggleHelp(dlg, slug, card) {
+  const set = dlg._state.helps_with;
+  if (set.has(slug)) { set.delete(slug); card.classList.remove("selected"); }
+  else { set.add(slug); card.classList.add("selected"); }
+}
+
+function joinGoTo(dlg, step) {
+  dlg._step = step;
+  const total = dlg._total || FLOW_TOTAL;
+  // progress
+  const pct = Math.min(100, (step / total) * 100);
+  const bar = dlg.querySelector(".flow-progress-bar");
+  if (bar) bar.style.width = pct.toFixed(1) + "%";
+  // step meta
+  const num = dlg.querySelector(".flow-step-num");
+  const tot = dlg.querySelector(".flow-step-total");
+  if (num) num.textContent = String(Math.min(step, total)).padStart(2, "0");
+  if (tot) tot.textContent = String(total).padStart(2, "0");
+  // swap visible step
+  const current = dlg.querySelector(".flow-step.active");
+  const target = dlg.querySelector(`.flow-step[data-step="${step}"]`);
+  if (current === target) return;
+  if (current) {
+    current.classList.remove("active");
+  }
+  if (target) {
+    target.classList.add("active");
+    // focus first input
+    setTimeout(() => {
+      const inp = target.querySelector("input:not([type=hidden])");
+      inp?.focus();
+    }, 60);
+  }
+  // hide error
+  dlg.querySelectorAll(".flow-error").forEach((e) => (e.hidden = true));
+}
+
+function validateStep(dlg, step) {
+  const s = dlg._state;
+  if (step === 1) {
+    if (!s.first_name.trim() || !s.last_name.trim()) {
+      return "Please enter your first and last name.";
+    }
+  } else if (step === 2) {
+    if (!s.role) return "Pick a branch — or write your own.";
+    if (s.role === "other" && !s.other_role.trim()) return "Describe yourself in a few words.";
+  } else if (step === 3) {
+    // help is optional
+  } else if (step === 4) {
+    if (!s.email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.email)) {
+      return "Enter a valid email address.";
+    }
+    if (s.password.length < 8) return "Password must be at least 8 characters.";
+  }
+  return null;
+}
+
+function showError(dlg, step, msg) {
+  const stepEl = dlg.querySelector(`.flow-step[data-step="${step}"]`);
+  const err = stepEl?.querySelector(".flow-error");
+  if (!err) return;
+  err.textContent = msg;
+  err.hidden = false;
+}
+
+function onNext(dlg) {
+  const step = dlg._step;
+  const err = validateStep(dlg, step);
+  if (err) { showError(dlg, step, err); return; }
+  joinGoTo(dlg, step + 1);
+}
+
+function onBack(dlg) {
+  if (dlg._step > 1) joinGoTo(dlg, dlg._step - 1);
+}
+
+function onSubmit(dlg) {
+  const err = validateStep(dlg, 4);
+  if (err) { showError(dlg, 4, err); return; }
+  const btn = dlg.querySelector(".flow-submit");
+  btn.disabled = true;
+  const s = dlg._state;
+  const payload = {
+    first_name: s.first_name,
+    last_name: s.last_name,
+    role: s.role,
+    other_role: s.role === "other" ? s.other_role : "",
+    helps_with: Array.from(s.helps_with),
+    city: s.city,
+    email: s.email,
+    password: s.password,
+  };
+  fetch(dlg.dataset.joinUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+    .then(async (r) => {
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error || "Server error");
+      joinGoTo(dlg, 5);
+    })
+    .catch((e) => {
+      showError(dlg, 4, e.message || "Something went wrong.");
+    })
+    .finally(() => { btn.disabled = false; });
 }

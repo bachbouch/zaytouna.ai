@@ -1,0 +1,41 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>{% if ok %}Account verified — Zaytouna{% else %}Verification failed — Zaytouna{% endif %}</title>
+<link rel="icon" type="image/png" href="{% static 'landing/assets/zaytouna-logo.png' %}" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="{% static 'landing/css/landing.css' %}" rel="stylesheet" />
+</head>
+<body>
+<div class="mesh-bg" aria-hidden="true">
+  <div class="mesh-blob a"></div>
+  <div class="mesh-blob b"></div>
+  <div class="mesh-blob c"></div>
+  <div class="mesh-grain"></div>
+</div>
+<div class="stage">
+  <main class="verify-page">
+    <img class="verify-logo" src="{% static 'landing/assets/zaytouna-logo.png' %}" alt="" />
+    {% if ok %}
+      <span class="verify-eyebrow">Account verified</span>
+      <h1 class="verify-title">Welcome to the grove, {{ first_name|default:"friend" }}.</h1>
+      <p class="verify-body">Your Zaytouna account is now active. We'll be in touch soon. Until then, head back to the manifesto or sign in.</p>
+      <div class="verify-cta">
+        <a href="/" class="btn btn-primary">Back to the site <span class="arrow">→</span></a>
+      </div>
+    {% else %}
+      <span class="verify-eyebrow verify-eyebrow-err">{{ reason|default:"Link invalid" }}</span>
+      <h1 class="verify-title">This link can't be used.</h1>
+      <p class="verify-body">It may have already been used, or it might have expired (links live for 3 days). If you need a new one, sign up again with the same email and we'll send a fresh link.</p>
+      <div class="verify-cta">
+        <a href="/" class="btn btn-ghost">Back to the site <span class="arrow">→</span></a>
+      </div>
+    {% endif %}
+  </main>
+</div>
+</body>
+</html>

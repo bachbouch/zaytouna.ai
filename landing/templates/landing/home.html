@@ -41,6 +41,11 @@
       <a href="#vision">{{ t.nav.vision }}</a>
       <a href="#grove">{{ t.nav.grove }}</a>
       <a href="#join" data-join>{{ t.nav.join }}</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" class="nav-logout">{% csrf_token %}<button type="submit" class="lang-switch">{{ t.logout_label }}</button></form>
+      {% else %}
+        <a href="{% url 'login' %}" class="lang-switch">{{ t.login_label }}</a>
+      {% endif %}
       <a href="{{ t.switch_url }}" class="lang-switch">{{ t.switch_label }}</a>
     </div>
     <div class="scroll-progress" aria-hidden="true"></div>
@@ -198,10 +203,10 @@
                 <circle class="halo" cx="{{ r.x|floatformat:1 }}" cy="{{ r.y|floatformat:1 }}" r="36"></circle>
                 <circle class="core" cx="{{ r.x|floatformat:1 }}" cy="{{ r.y|floatformat:1 }}" r="22"></circle>
                 <text class="glyph" x="{{ r.x|floatformat:1 }}" y="{{ r.y|add:6|floatformat:1 }}" text-anchor="middle">{{ r.glyph }}</text>
-                <rect class="pill"
-                  x="{{ r.x|add:-50|floatformat:1 }}" y="{{ r.y|add:44|floatformat:1 }}"
-                  width="100" height="30" rx="15"></rect>
-                <text class="label" x="{{ r.x|floatformat:1 }}" y="{{ r.y|add:63|floatformat:1 }}" text-anchor="middle">{{ r.name }}</text>
+                <text class="label"
+                  x="{{ r.label_x|floatformat:1 }}"
+                  y="{{ r.label_y|floatformat:1 }}"
+                  text-anchor="{{ r.text_anchor }}">{{ r.name }}</text>
               </g>
             {% endfor %}
           </svg>
@@ -264,30 +269,122 @@
 
 </div>
 
-<!-- ── JOIN MODAL ─────────────────────────────────────── -->
-<dialog id="join-modal" class="modal">
-  <div class="modal-card">
-    <button class="modal-close" aria-label="Close">×</button>
+<!-- ── JOIN FLOW (multi-step) ─────────────────────────── -->
+<dialog id="join-modal" class="join-flow"
+        data-lang="{{ lang }}"
+        data-other-label="{{ t.join_flow.q2_other }}"
+        data-roles-url="{% url 'landing:api_roles' %}"
+        data-help-url="{% url 'landing:api_help_items' %}"
+        data-join-url="{% url 'landing:api_join' %}">
+  <button class="flow-close" type="button" aria-label="Close">×</button>
 
-    <div class="modal-form-wrap">
-      <span class="modal-prefix">{{ t.modal.join_as }}</span>
-      <h3 class="modal-title"><span data-role-name>{{ roles.0.name }}</span></h3>
-      <p class="modal-desc" data-role-desc></p>
-      <form class="modal-form" method="post" action="#">
-        <input type="hidden" name="role" data-role-id value="researcher" />
-        <label><span class="lbl">{{ t.modal.name }}</span><input name="name" required /></label>
-        <label><span class="lbl">{{ t.modal.email }}</span><input name="email" type="email" required /></label>
-        <label><span class="lbl">{{ t.modal.city }}</span><input name="city" /></label>
-        <label><span class="lbl">{{ t.modal.why }}</span><textarea name="why" rows="3"></textarea></label>
-        <button class="modal-submit" type="submit">{{ t.modal.submit }}</button>
-      </form>
-    </div>
+  <div class="flow-progress" aria-hidden="true">
+    <div class="flow-progress-bar"></div>
+  </div>
 
-    <div class="modal-success" hidden>
-      <img src="{% static 'landing/assets/zaytouna-logo.png' %}" width="72" height="72" alt="" />
-      <h3>{{ t.modal.welcome }}</h3>
-      <p class="modal-desc">{{ t.modal.followup }}</p>
-    </div>
+  <div class="flow-meta">
+    <span class="flow-step-num">01</span>
+    <span class="flow-step-sep">/</span>
+    <span class="flow-step-total">04</span>
+  </div>
+
+  <div class="flow-stage">
+
+    <!-- Step 1: name -->
+    <section class="flow-step" data-step="1">
+      <div class="flow-eyebrow">{{ t.join_flow.q1_eyebrow }}</div>
+      <h2 class="flow-q">{{ t.join_flow.q1_title }}</h2>
+      <p class="flow-hint">{{ t.join_flow.q1_hint }}</p>
+      <div class="flow-fields flow-fields-name">
+        <label>
+          <span class="flow-lbl">{{ t.join_flow.q1_first }}</span>
+          <input type="text" name="first_name" autocomplete="given-name" data-required required />
+        </label>
+        <label>
+          <span class="flow-lbl">{{ t.join_flow.q1_last }}</span>
+          <input type="text" name="last_name" autocomplete="family-name" data-required required />
+        </label>
+      </div>
+      <div class="flow-error" hidden></div>
+      <div class="flow-cta">
+        <button type="button" class="flow-next">{{ t.join_flow.btn_continue }} <span class="arrow">→</span></button>
+        <span class="flow-kbd">{{ t.join_flow.kbd_enter }}</span>
+      </div>
+    </section>
+
+    <!-- Step 2: role -->
+    <section class="flow-step" data-step="2">
+      <div class="flow-eyebrow">{{ t.join_flow.q2_eyebrow }}</div>
+      <h2 class="flow-q">{{ t.join_flow.q2_title }}</h2>
+      <p class="flow-hint">{{ t.join_flow.q2_hint }}</p>
+      <div class="role-cards" role="radiogroup" aria-label="Role">
+        <!-- populated by JS from /api/roles/ -->
+        <div class="flow-loading">…</div>
+      </div>
+      <div class="other-role-wrap" hidden>
+        <input type="text" name="other_role" placeholder="{{ t.join_flow.q2_other_placeholder }}" />
+      </div>
+      <div class="flow-error" hidden></div>
+      <div class="flow-cta">
+        <button type="button" class="flow-back">{{ t.join_flow.btn_back }}</button>
+        <button type="button" class="flow-next">{{ t.join_flow.btn_continue }} <span class="arrow">→</span></button>
+      </div>
+    </section>
+
+    <!-- Step 3: help -->
+    <section class="flow-step" data-step="3">
+      <div class="flow-eyebrow">{{ t.join_flow.q3_eyebrow }}</div>
+      <h2 class="flow-q">{{ t.join_flow.q3_title }}</h2>
+      <p class="flow-hint">{{ t.join_flow.q3_hint }}</p>
+      <div class="help-cards">
+        <div class="flow-loading">…</div>
+      </div>
+      <div class="flow-error" hidden></div>
+      <div class="flow-cta">
+        <button type="button" class="flow-back">{{ t.join_flow.btn_back }}</button>
+        <button type="button" class="flow-next">{{ t.join_flow.btn_continue }} <span class="arrow">→</span></button>
+      </div>
+    </section>
+
+    <!-- Step 4: account -->
+    <section class="flow-step" data-step="4">
+      <div class="flow-eyebrow">{{ t.join_flow.q4_eyebrow }}</div>
+      <h2 class="flow-q">{{ t.join_flow.q4_title }}</h2>
+      <p class="flow-hint">{{ t.join_flow.q4_hint }}</p>
+      <div class="flow-fields flow-fields-account">
+        <label>
+          <span class="flow-lbl">{{ t.join_flow.q4_city }}</span>
+          <select name="city" autocomplete="address-level1">
+            <option value="">—</option>
+            {% for g in governorates %}<option value="{{ g.slug }}">{{ g.name }}</option>{% endfor %}
+          </select>
+        </label>
+        <label>
+          <span class="flow-lbl">{{ t.join_flow.q4_email }}</span>
+          <input type="email" name="email" autocomplete="email" data-required required />
+        </label>
+        <label>
+          <span class="flow-lbl">{{ t.join_flow.q4_password }}</span>
+          <input type="password" name="password" autocomplete="new-password" data-required required minlength="8" />
+        </label>
+      </div>
+      <div class="flow-error" hidden></div>
+      <div class="flow-cta">
+        <button type="button" class="flow-back">{{ t.join_flow.btn_back }}</button>
+        <button type="button" class="flow-submit">{{ t.join_flow.btn_submit }} <span class="arrow">✓</span></button>
+      </div>
+    </section>
+
+    <!-- Step 5: success -->
+    <section class="flow-step flow-success" data-step="5">
+      <img class="success-logo" src="{% static 'landing/assets/zaytouna-logo.png' %}" alt="" />
+      <h2 class="flow-q">{{ t.join_flow.success_title }}</h2>
+      <p class="flow-hint">{{ t.join_flow.success_body }}</p>
+      <div class="flow-cta">
+        <button type="button" class="flow-close-success">{{ t.join_flow.success_close }}</button>
+      </div>
+    </section>
+
   </div>
 </dialog>
 
