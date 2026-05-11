@@ -262,7 +262,12 @@
     </div>
     <footer class="foot">
       <span>{{ t.footer.address }}</span>
-      <span>{{ t.footer.rights }}</span>
+      <span class="foot-community">
+        {% if community.discord or community.telegram %}<span class="foot-community-cta">{{ t.community.talk_cta }}</span>{% endif %}
+        {% if community.discord %}<a href="{{ community.discord }}" target="_blank" rel="noopener" class="foot-link">{{ t.community.discord }} ↗</a>{% endif %}
+        {% if community.telegram %}<a href="{{ community.telegram }}" target="_blank" rel="noopener" class="foot-link">{{ t.community.telegram }} ↗</a>{% endif %}
+        {% if community.huggingface %}<span class="foot-community-cta">·&nbsp;{{ t.community.build_cta }}</span><a href="{{ community.huggingface }}" target="_blank" rel="noopener" class="foot-link">🤗 {{ t.community.huggingface }} ↗</a>{% endif %}
+      </span>
       <span>{{ t.footer.copy }}</span>
     </footer>
   </section>

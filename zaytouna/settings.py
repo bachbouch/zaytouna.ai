@@ -62,6 +62,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "landing.context_processors.community",
             ],
         },
     },
@@ -133,3 +134,8 @@ LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3  # 3 days
+
+# ── Community channels (set to empty string to hide a link everywhere) ──
+COMMUNITY_TELEGRAM = ""  # not set up yet — add the t.me URL when ready
+COMMUNITY_DISCORD = "https://discord.gg/fQ2xbfKdK"
+COMMUNITY_HUGGINGFACE = "https://huggingface.co/ZaytounaAi"

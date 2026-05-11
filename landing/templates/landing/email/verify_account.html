@@ -6,6 +6,16 @@
   <p style="font-size:15px;line-height:1.6;color:rgba(240,235,222,0.7);margin:8px 0 24px;">Activate your account by clicking the button below. The link is single-use and expires after 3 days.</p>
   <p style="margin:28px 0;"><a href="{{ verify_url }}" style="display:inline-block;background:#d4a574;color:#1a1108;padding:14px 28px;border-radius:99px;text-decoration:none;font-weight:600;font-size:14px;letter-spacing:0.01em;">Activate my account</a></p>
   <p style="font-size:12px;line-height:1.6;color:rgba(240,235,222,0.45);margin:24px 0 0;">Or paste this URL: <br><span style="color:rgba(240,235,222,0.8);word-break:break-all;">{{ verify_url }}</span></p>
-  <p style="font-size:12px;line-height:1.6;color:rgba(240,235,222,0.45);margin:24px 0 0;border-top:0.5px solid rgba(232,227,214,0.08);padding-top:18px;">If you didn't sign up, you can ignore this email.<br>— The Zaytouna team · zaytouna.ai</p>
+  {% if community.discord or community.telegram or community.huggingface %}
+  <div style="margin:28px 0 0;padding:18px 0 0;border-top:0.5px solid rgba(232,227,214,0.08);">
+    <p style="font-size:13px;line-height:1.5;color:rgba(240,235,222,0.7);margin:0 0 10px;">While we keep building:</p>
+    <p style="margin:0;">
+      {% if community.discord %}<a href="{{ community.discord }}" style="color:#d4a574;text-decoration:none;font-size:13px;margin-right:16px;">Discord ↗</a>{% endif %}
+      {% if community.telegram %}<a href="{{ community.telegram }}" style="color:#d4a574;text-decoration:none;font-size:13px;margin-right:16px;">Telegram ↗</a>{% endif %}
+      {% if community.huggingface %}<a href="{{ community.huggingface }}" style="color:#d4a574;text-decoration:none;font-size:13px;">🤗 Hugging Face ↗</a>{% endif %}
+    </p>
+  </div>
+  {% endif %}
+  <p style="font-size:12px;line-height:1.6;color:rgba(240,235,222,0.45);margin:18px 0 0;">If you didn't sign up, you can ignore this email.<br>— The Zaytouna team · zaytouna.ai</p>
 </div>
 </body></html>{% endautoescape %}

@@ -23,9 +23,16 @@
     {% if ok %}
       <span class="verify-eyebrow">Account verified</span>
       <h1 class="verify-title">Welcome to the grove, {{ first_name|default:"friend" }}.</h1>
-      <p class="verify-body">Your Zaytouna account is now active. We'll be in touch soon. Until then, head back to the manifesto or sign in.</p>
+      <p class="verify-body">Your Zaytouna account is now active. Come say hi to the others while we keep building.</p>
+      {% if community.discord or community.telegram or community.huggingface %}
+      <div class="verify-community">
+        {% if community.discord %}<a href="{{ community.discord }}" target="_blank" rel="noopener" class="btn btn-primary">Join on Discord <span class="arrow">↗</span></a>{% endif %}
+        {% if community.telegram %}<a href="{{ community.telegram }}" target="_blank" rel="noopener" class="btn btn-ghost">Join on Telegram <span class="arrow">↗</span></a>{% endif %}
+        {% if community.huggingface %}<a href="{{ community.huggingface }}" target="_blank" rel="noopener" class="btn btn-ghost">🤗 Hugging Face <span class="arrow">↗</span></a>{% endif %}
+      </div>
+      {% endif %}
       <div class="verify-cta">
-        <a href="/" class="btn btn-primary">Back to the site <span class="arrow">→</span></a>
+        <a href="/login/" class="verify-link">Sign in to your account →</a>
       </div>
     {% else %}
       <span class="verify-eyebrow verify-eyebrow-err">{{ reason|default:"Link invalid" }}</span>

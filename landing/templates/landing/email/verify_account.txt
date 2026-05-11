@@ -8,5 +8,11 @@ Welcome to the grove. To activate your Zaytouna account, click the link below
 This link is single-use and will stop working once you've verified — or after
 3 days. If you didn't sign up for Zaytouna, you can ignore this email.
 
+{% if community.discord or community.telegram or community.huggingface %}While we keep building:
+{% if community.discord %}• Discord:      {{ community.discord }}
+{% endif %}{% if community.telegram %}• Telegram:     {{ community.telegram }}
+{% endif %}{% if community.huggingface %}• Hugging Face: {{ community.huggingface }}
+{% endif %}{% endif %}
+
 — The Zaytouna team
 zaytouna.ai{% endautoescape %}
