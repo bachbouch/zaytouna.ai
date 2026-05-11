@@ -1,0 +1,294 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zaytouna AI — Rooted in Tunisia, reaching toward the future.</title>
+<meta name="description" content="Foundational AI for Tunisia — Darija language models, sovereign speech, mapping, and data. A grassroots collective for digital sovereignty." />
+<link rel="icon" type="image/png" href="{% static 'landing/assets/zaytouna-logo.png' %}" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="{% static 'landing/css/landing.css' %}" rel="stylesheet" />
+</head>
+<body>
+
+<div class="scroll-progress" aria-hidden="true"></div>
+
+<div class="mesh-bg" aria-hidden="true">
+  <div class="mesh-blob a"></div>
+  <div class="mesh-blob b"></div>
+  <div class="mesh-blob c"></div>
+  <div class="mesh-grain"></div>
+</div>
+
+<div class="stage">
+
+  <nav class="nav" aria-label="Primary">
+    <a href="#" class="nav-brand">
+      <img src="{% static 'landing/assets/zaytouna-logo.png' %}" alt="" />
+      <span class="name">Zaytouna</span>
+      <span class="tag">AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="#manifesto">Philosophy</a>
+      <a href="#vision">Vision</a>
+      <a href="#grove">The Grove</a>
+      <a href="#join" data-join>Join</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span class="dot">Zaytouna AI · Tunis · est. 2026</span>
+      <span>36.806°N · 10.181°E · TUNIS</span>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="reveal">
+          <div class="hero-badge">
+            <span class="glyph">ز</span>
+            <span>Founding chapter · 2026</span>
+          </div>
+        </div>
+
+        <h1 class="hero-title kinetic" data-kinetic data-stagger="70">Rooted in Tunisia, reaching toward the future.</h1>
+
+        <p class="hero-sub reveal" style="transition-delay:650ms">
+          Foundational models for Tunisian Darija. Speech that hears us. Maps that know us. A grassroots collective for digital sovereignty.
+        </p>
+
+        <div class="hero-actions reveal" style="transition-delay:850ms">
+          <a href="#manifesto" class="btn btn-primary">Read the manifesto <span class="arrow">↗</span></a>
+          <a href="#join" class="btn btn-ghost" data-join>Find your branch →</a>
+        </div>
+
+        <div class="hero-stats reveal" style="transition-delay:1050ms">
+          <div>
+            <div class="v">{{ stats.members }}</div>
+            <div class="l">Members</div>
+          </div>
+          <div>
+            <div class="v">{{ stats.governorates }}</div>
+            <div class="l">Governorates</div>
+          </div>
+          <div>
+            <div class="v">{{ stats.groups }}</div>
+            <div class="l">Working groups</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-tree">
+        <div class="olive-stage">
+          <div class="olive-halo" aria-hidden="true"></div>
+          <svg class="olive-rings" viewBox="-360 -360 720 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <circle cx="0" cy="0"></circle>
+            <circle cx="0" cy="0"></circle>
+            <circle cx="0" cy="0"></circle>
+          </svg>
+          <img class="olive-img" src="{% static 'landing/assets/hero-tree.png' %}" alt="Zaytouna olive tree" />
+          <svg class="olive-fx" viewBox="-300 -300 600 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <span>Scroll to read the manifesto</span>
+      <span><span class="fall"></span>01 / 05</span>
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ──────────────────────────────────────── -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      {% for w in marquee_words %}<span>{{ w }}</span>{% endfor %}
+      {% for w in marquee_words %}<span>{{ w }}</span>{% endfor %}
+      {% for w in marquee_words %}<span>{{ w }}</span>{% endfor %}
+    </div>
+  </div>
+
+  <!-- ── MANIFESTO ────────────────────────────────────── -->
+  <section id="manifesto" class="manifesto section-pad container section-frame">
+    <div class="reveal">
+      <div class="section-eyebrow">
+        <span class="num">§ 01</span><span class="rule"></span><span class="label">Manifesto</span>
+      </div>
+    </div>
+    <h2 class="section-title kinetic" data-kinetic data-stagger="80">Working in the open.</h2>
+    <ol class="manifesto-list">
+      {% for line in manifesto %}
+        <li class="manifesto-item reveal" style="transition-delay:{{ forloop.counter0 }}00ms">
+          <div class="m-num">
+            <span class="m-n">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span class="m-of">of {{ manifesto|length|stringformat:"02d" }}</span>
+          </div>
+          <div class="m-marker"><span class="m-dot"></span></div>
+          <p class="m-body">{{ line }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <!-- ── VISION ───────────────────────────────────────── -->
+  <section id="vision" class="vision section-pad section-frame">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-eyebrow">
+          <span class="num">§ 02</span><span class="rule"></span><span class="label">Vision</span>
+        </div>
+      </div>
+      <h2 class="section-title kinetic" data-kinetic data-stagger="80">Six branches. One trunk.</h2>
+      <div class="pillars">
+        {% for p in pillars %}
+          <div class="pillar reveal" style="transition-delay:{{ forloop.counter0 }}0ms">
+            <div class="n">{{ p.n }}</div>
+            <h3>{{ p.name }}</h3>
+            <p>{{ p.desc }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ROLES ────────────────────────────────────────── -->
+  <section id="join" class="section-pad container section-frame">
+    <div class="roles-grid">
+      <div class="roles-text">
+        <div class="reveal">
+          <div class="section-eyebrow">
+            <span class="num">§ 03</span><span class="rule"></span><span class="label">Find your branch</span>
+          </div>
+        </div>
+        <h2 class="section-title kinetic" data-kinetic data-stagger="80">Ten ways to belong.</h2>
+        <p class="reveal" style="transition-delay:400ms">
+          Every grove needs every kind of hand. Pick a branch — or a few.
+        </p>
+      </div>
+
+      <div class="reveal" style="transition-delay:500ms">
+        <div class="roles-stage">
+          <img class="roles-logo" src="{% static 'landing/assets/zaytouna-logo.png' %}" alt="" />
+          <svg class="roles-svg" viewBox="-360 -360 720 720" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              {% for r in roles %}
+                <linearGradient id="branch-{{ r.id }}" gradientUnits="userSpaceOnUse"
+                  x1="{{ r.x|floatformat:1 }}" y1="-80" x2="{{ r.x|floatformat:1 }}" y2="{{ r.y|floatformat:1 }}">
+                  <stop offset="0%" stop-color="var(--green)" stop-opacity="0" />
+                  <stop offset="55%" stop-color="var(--green)" stop-opacity="0" />
+                  <stop offset="72%" stop-color="var(--warm)" stop-opacity="0.25" />
+                  <stop offset="88%" stop-color="var(--warm)" stop-opacity="0.6" />
+                  <stop offset="100%" stop-color="var(--warm)" stop-opacity="0.95" />
+                </linearGradient>
+              {% endfor %}
+            </defs>
+
+            {% for r in roles %}
+              <g class="role-node" data-id="{{ r.id }}" data-name="{{ r.name }}" data-desc="{{ r.desc }}">
+                <path class="branch" stroke="url(#branch-{{ r.id }})"
+                  d="M {{ r.x|floatformat:1 }} -80 Q {{ r.x|floatformat:1 }} {{ r.y|floatformat:1 }}, {{ r.x|floatformat:1 }} {{ r.y|floatformat:1 }}"
+                  pathLength="1"></path>
+                <circle class="hit"  cx="{{ r.x|floatformat:1 }}" cy="{{ r.y|floatformat:1 }}" r="48"></circle>
+                <circle class="halo" cx="{{ r.x|floatformat:1 }}" cy="{{ r.y|floatformat:1 }}" r="36"></circle>
+                <circle class="core" cx="{{ r.x|floatformat:1 }}" cy="{{ r.y|floatformat:1 }}" r="22"></circle>
+                <text class="glyph" x="{{ r.x|floatformat:1 }}" y="{{ r.y|add:6|floatformat:1 }}" text-anchor="middle">{{ r.glyph }}</text>
+                {% with label_w=r.name|length|add:4 %}
+                <rect class="pill"
+                  x="{{ r.x|add:-50|floatformat:1 }}" y="{{ r.y|add:44|floatformat:1 }}"
+                  width="100" height="30" rx="15"></rect>
+                <text class="label" x="{{ r.x|floatformat:1 }}" y="{{ r.y|add:63|floatformat:1 }}" text-anchor="middle">{{ r.name|upper }}</text>
+                {% endwith %}
+              </g>
+            {% endfor %}
+          </svg>
+          <div class="role-desc" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GROVE ────────────────────────────────────────── -->
+  <section id="grove" class="grove section-pad section-frame">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-eyebrow">
+          <span class="num">§ 04</span><span class="rule"></span><span class="label">The Grove</span>
+        </div>
+      </div>
+      <div class="grove-head">
+        <h2 class="section-title kinetic" data-kinetic data-stagger="80" style="margin-bottom:0">The grove, as of today.</h2>
+        <div class="counters">
+          <div class="counter"><div class="v" data-count="{{ stats.members }}">0</div><div class="l">Members</div></div>
+          <div class="counter"><div class="v" data-count="{{ stats.governorates }}">0</div><div class="l">Governorates</div></div>
+          <div class="counter"><div class="v" data-count="{{ stats.groups }}">0</div><div class="l">Working groups</div></div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="role-filters">
+          <button class="active" data-filter="all">All</button>
+          {% for r in roles %}<button data-filter="{{ r.id }}">{{ r.name }}</button>{% endfor %}
+        </div>
+      </div>
+
+      <div class="members">
+        {% for m in members %}
+          <div class="member" data-role="{{ m.role }}">
+            <div class="avatar">{{ m.initials }}</div>
+            <div class="name">{{ m.name }}</div>
+            <div class="meta">{{ m.role_name }} · {{ m.city }}</div>
+            <div class="bio">{{ m.bio }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA + FOOTER ─────────────────────────────────── -->
+  <section class="cta">
+    <div class="cta-inner">
+      <h2 class="kinetic" data-kinetic data-stagger="80">Plant something that <span class="emph">o</span>ut<span class="emph">live</span>s us.</h2>
+      <p class="reveal" style="transition-delay:500ms">Open call. No résumé required. Just a willingness to show up.</p>
+      <a class="btn btn-cta reveal" style="transition-delay:650ms" href="#join" data-join>Begin →</a>
+    </div>
+    <footer class="foot">
+      <span>zaytouna.ai · Lac 2, Tunis</span>
+      <span>Open weights. Open data. Open future.</span>
+      <span>© 2026 — Zaytouna Foundation</span>
+    </footer>
+  </section>
+
+</div>
+
+<!-- ── JOIN MODAL ─────────────────────────────────────── -->
+<dialog id="join-modal" class="modal">
+  <div class="modal-card">
+    <button class="modal-close" aria-label="Close">×</button>
+
+    <div class="modal-form-wrap">
+      <span class="modal-prefix">Join as</span>
+      <h3 class="modal-title"><span data-role-name>Researcher</span></h3>
+      <p class="modal-desc" data-role-desc></p>
+      <form class="modal-form" method="post" action="#">
+        <input type="hidden" name="role" data-role-id value="researcher" />
+        <label><span class="lbl">Name</span><input name="name" required /></label>
+        <label><span class="lbl">Email</span><input name="email" type="email" required /></label>
+        <label><span class="lbl">City / Governorate</span><input name="city" /></label>
+        <label><span class="lbl">Why this branch?</span><textarea name="why" rows="3"></textarea></label>
+        <button class="modal-submit" type="submit">Plant your name</button>
+      </form>
+    </div>
+
+    <div class="modal-success" hidden>
+      <img src="{% static 'landing/assets/zaytouna-logo.png' %}" width="72" height="72" alt="" />
+      <h3>Welcome to the grove.</h3>
+      <p class="modal-desc">We will write back within seven days. Inshallah, sooner.</p>
+    </div>
+  </div>
+</dialog>
+
+<script src="{% static 'landing/js/landing.js' %}" defer></script>
+</body>
+</html>
