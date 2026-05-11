@@ -5,13 +5,17 @@ from . import content
 
 class HomeView(TemplateView):
     template_name = "landing/home.html"
+    lang = "en"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["manifesto"] = content.MANIFESTO
-        ctx["pillars"] = content.PILLARS
-        ctx["roles"] = content.ROLES
-        ctx["members"] = content.MEMBERS
-        ctx["marquee_words"] = content.MARQUEE_WORDS
+        ctx["lang"] = self.lang
+        ctx["t"] = content.TEXTS[self.lang]
+        ctx["roles"] = content.get_roles(self.lang)
+        ctx["members"] = content.get_members(self.lang)
         ctx["stats"] = content.STATS
         return ctx
+
+
+class HomeDarijaView(HomeView):
+    lang = "ar-TN"

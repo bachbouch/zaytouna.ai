@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRoleNodes();
   initRoleFilter();
   initModal();
+  initDraftBanner();
 });
 
 // ── scroll progress + sticky nav ─────────────────────────
@@ -128,6 +129,18 @@ function initTreeParallax() {
         : "";
       if (rings) rings.style.transform = "";
     });
+  });
+}
+
+// ── draft banner dismiss ─────────────────────────────────
+function initDraftBanner() {
+  const banner = document.querySelector(".draft-banner");
+  if (!banner) return;
+  const close = banner.querySelector(".draft-close");
+  if (!close) return;
+  close.addEventListener("click", () => {
+    banner.classList.add("hidden");
+    document.body.classList.add("banner-dismissed");
   });
 }
 
